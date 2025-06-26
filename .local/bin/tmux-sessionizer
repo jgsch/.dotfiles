@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+ASSO=$(fd . "${HOME}/Projects/asso" --type directory --exact-depth 2)
+PERSONNAL=$(fd . "${HOME}/Projects/perso" --type directory --exact-depth 1)
+DOTFILES="${HOME}/.dotfiles"
+WORK=$(fd . "${HOME}/Projects/taff" --type directory --exact-depth 2)
+SELECTED_PATH=$(printf "%s\n" ${ASSO} ${PERSONNAL} ${DOTFILES} ${WORK} | fzf)
+
+SELECTED_DIR=$(basename "${SELECTED_PATH}" | tr . _)
+TMUX_RUNNING=$(pgrep tmux)
+
+if ! tmux has-session -t="${SELECTED_DIR}" 2> /dev/null; then
+  tmux new-session -ds "${SELECTED_DIR}" -c "${SELECTED_PATH}"
+  tmux split-window -v -t "${SELECTED_DIR}" -c "${SELECTED_PATH}"
+fi
+
+if [[ -z ${TMUX} ]]; then
+  tmux attach-session -t ${SELECTED_DIR}
+else
+  tmux switch-client -t ${SELECTED_DIR}
+fi
