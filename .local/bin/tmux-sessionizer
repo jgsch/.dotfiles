@@ -1,21 +1,30 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-ASSO=$(fd . "${HOME}/Projects/asso" --type directory --exact-depth 2)
-PERSONNAL=$(fd . "${HOME}/Projects/perso" --type directory --exact-depth 1)
-DOTFILES="${HOME}/.dotfiles"
-WORK=$(fd . "${HOME}/Projects/taff" --type directory --exact-depth 2)
-SELECTED_PATH=$(printf "%s\n" ${ASSO} ${PERSONNAL} ${DOTFILES} ${WORK} | fzf)
+declare -A SEARCHING_DIRS # path / depth search
+SEARCHING_DIRS["${HOME}/Projects/asso"]="2"
+SEARCHING_DIRS["${HOME}/Projects/work"]="1"
+SEARCHING_DIRS["${HOME}/Projects/personnal"]="2"
 
-SELECTED_DIR=$(basename "${SELECTED_PATH}" | tr . _)
+DIRS="${HOME}/.dotfiles"
+for DIR in "${!SEARCHING_DIRS[@]}"; do
+  if [ -d $DIR ]; then
+    DEPTH="${SEARCHING_DIRS[$DIR]}"
+    DIRS="${DIRS} $(fd . ${DIR} --type directory --exact-depth ${DEPTH})"
+  fi
+done
+
+SELECTED_DIR=$(printf "%s\n" ${DIRS} | fzf)
+SELECTED_DIRNAME=$(basename "${SELECTED_DIR}" | tr . _)
+
 TMUX_RUNNING=$(pgrep tmux)
 
-if ! tmux has-session -t="${SELECTED_DIR}" 2> /dev/null; then
-  tmux new-session -ds "${SELECTED_DIR}" -c "${SELECTED_PATH}"
-  tmux split-window -v -t "${SELECTED_DIR}" -c "${SELECTED_PATH}"
+if ! tmux has-session -t="${SELECTED_DIRNAME}" 2> /dev/null; then
+  tmux new-session -ds "${SELECTED_DIRNAME}" -c "${SELECTED_DIR}"
+  tmux split-window -v -t "${SELECTED_DIRNAME}" -c "${SELECTED_DIR}"
 fi
 
 if [[ -z ${TMUX} ]]; then
-  tmux attach-session -t ${SELECTED_DIR}
+  tmux attach-session -t ${SELECTED_DIRNAME}
 else
-  tmux switch-client -t ${SELECTED_DIR}
+  tmux switch-client -t ${SELECTED_DIRNAME}
 fi
