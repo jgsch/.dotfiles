@@ -13,68 +13,30 @@ while [[ $# -gt 0 ]]; do
 done
 
 #
-# nix 
+# nix
 #
 
-if $REINSTALL; then
-  echo "[reinstall] removing existing Nix…"
+NIX_DIR="${HOME}/.nix-profile"
+
+if [[ "$REINSTALL" == "true" && -d "$NIX_DIR" ]]; then
+  echo "[nix] cleaning…"
   sudo rm -rf /nix /etc/nix /var/lib/nix /var/log/nix
   sudo rm -f  /etc/profile.d/nix.sh /etc/profile.d/nix.csh /etc/profile.d/nix.fish
   rm -rf ~/.nix-profile ~/.nix-defexpr ~/.nix-channels ~/.config/nix ~/.cache/nix ~/.local/state/nix
 fi
 
-if ! which nix > /dev/null 2>&1; then
-  echo "[install] installing Nix (single-user)…"
+if [[ ! -d ${NIX_DIR} ]]; then
+  echo "[nix] installing (single-user)…"
 
   # install
   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon
 
-  # config
-  mkdir -p ~/.config/nix
-  echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+  . "$HOME/.nix-profile/etc/profile.d/nix.sh" 2>/dev/null || . "$HOME/.nix-profile/etc/profile.d/nix-daemon.sh" 2>/dev/null
 
   # replace legacy nix with flake
   NIX_BIN="$(readlink -f "$(command -v nix)")"
-  nix profile remove nix
-  "$NIX_BIN" profile add nixpkgs#nix
-fi
-
-#
-# miniconda
-#
-
-MINICONDA_DIR=${HOME}/.miniconda3
-
-if [[ $REINSTALL && -d "$MINICONDA_DIR" ]]; then
-  echo "[reinstall] removing existing Miniconda…"
-  rm -rf ${MINICONDA_DIR}
-fi
-
-if [[ ! -d ${MINICONDA_DIR} ]]; then
-  echo "[install] installing Miniconda…"
-
-  MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-  TMP="$(mktemp)"
-  curl -fsSL "${MINICONDA_URL}" -o "$TMP"
-
-  bash "$TMP" -b -p "${INSTALL_DIR}"
-  ${INSTALL_DIR}/condabin/conda config --set auto_activate_base false
-fi
-
-#
-# rust
-#
-
-CARGO_DIR=${HOME}/.cargo
-
-if [[ $REINSTALL && -d "$CARGO_DIR" ]]; then
-  echo "[reinstall] removing existing Cargo…"
-  rm -rf ${CARGO_DIR}
-fi
-
-if [[ ! -d ${CARGO_DIR} ]]; then
-  echo "[install] installing Cargo…"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  "$NIX_BIN" --extra-experimental-features 'nix-command flakes' profile remove nix
+  "$NIX_BIN" --extra-experimental-features 'nix-command flakes' profile add nixpkgs#nix
 fi
 
 PACKAGES=(
@@ -84,22 +46,21 @@ PACKAGES=(
   nixpkgs#htop
   nixpkgs#just
   nixpkgs#fd
+  nixpkgs#fzf
   nixpkgs#flatpak
   nixpkgs#git
   nixpkgs#gcc
   nixpkgs#ffmpeg
-  nixpkgs#localsend
   nixpkgs#neovim
   nixpkgs#nodejs_24
   nixpkgs#lsd
   nixpkgs#pyright
-  nixpkgs#neovim
   nixpkgs#starship
   nixpkgs#stow
   nixpkgs#tmux
   nixpkgs#ripgrep
-  nixpkgs#vscodium
   nixpkgs#wget
+  nixpkgs#zoxide
 )
 
 DESKTOP_APPS=(
@@ -108,10 +69,12 @@ DESKTOP_APPS=(
   nixpkgs#keepassxc
   nixpkgs#onlyoffice-desktopeditors
   nixpkgs#gimp3
+  nixpkgs#localsend
   nixpkgs#nicotine-plus
   nixpkgs#papirus-icon-theme
   nixpkgs#transmission_4
   nixpkgs#signal-desktop
+  nixpkgs#vscodium
   nixpkgs#ungoogled-chromium
   github:0xc000022070/zen-browser-flake
 )
@@ -126,13 +89,83 @@ if $DESKTOP; then
   done
 fi
 
-echo "[packages] installing requested packages…"
-nix profile add $ADD
+echo "[nix] installing requested packages…"
+nix --extra-experimental-features 'nix-command flakes' profile add $ADD
+
+#
+# miniconda
+#
+
+MINICONDA_DIR=${HOME}/.miniconda3
+
+if [[ "$REINSTALL" == "true" && -d "$MINICONDA_DIR" ]]; then
+  echo "[conda] cleaning…"
+  rm -rf ${MINICONDA_DIR}
+fi
+
+if [[ ! -d ${MINICONDA_DIR} ]]; then
+  echo "[conda] installing…"
+
+  MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+  TMP="${PWD}/miniconda.sh"
+  curl -fsSL "${MINICONDA_URL}" -o "$TMP"
+
+  bash "$TMP" -b -p "${MINICONDA_DIR}"
+  ${MINICONDA_DIR}/condabin/conda config --set auto_activate_base false
+
+  rm ${TMP}
+fi
+
+#
+# rust
+#
+
+CARGO_DIR=${HOME}/.cargo
+
+if [[ "$REINSTALL" == "true" && -d "$CARGO_DIR" ]]; then
+  echo "[cargo] cleaning…"
+  rm -rf ${CARGO_DIR}
+fi
+
+if [[ ! -d ${CARGO_DIR} ]]; then
+  echo "[cargo] installing…"
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+fi
+
+
+#
+# setup zsh
+# 
+#
+
+echo "[git] setup…"
 
 git config --global core.editor "nvim"
 git config --global alias.car "commit --amend --no-edit"
 git config --global alias.unstage "reset"
 git config --global alias.ucommit "reset --soft HEAD^"
+
+#
+# setup zsh
+# 
+
+echo "[zsh] setup…"
+
+sudo dnf install -y zsh
+ZSHPATH=$(which zsh)
+sudo usermod -s "$ZSHPATH" "$USER"
+
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+if [[ ! -d ${ZINIT_HOME} ]]; then
+  mkdir -p "$(dirname $ZINIT_HOME)"
+  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
+
+#
+# setup dotfiles
+# 
+
+echo "[dotfiles] setup…"
 
 stow .
 
