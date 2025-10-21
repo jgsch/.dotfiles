@@ -2,15 +2,14 @@
 save_to_clipboard = true
 
 [window]
-#decorations = "None"
+decorations = "None"
 padding.x = 8
-padding.y = 4
+padding.y = 8
 
 [keyboard]
 
 bindings = [
   {action = "ToggleFullscreen", key = "F11" },
-  # {action = "Quit", mods = "Control", key = "Q" }
 ]
 
 [mouse]
