@@ -41,8 +41,6 @@ fi
 
 PACKAGES=(
   nixpkgs#curl
-  nixpkgs#docker
-  nixpkgs#docker-compose
   nixpkgs#htop
   nixpkgs#just
   nixpkgs#fd
@@ -130,6 +128,18 @@ fi
 if [[ ! -d ${CARGO_DIR} ]]; then
   echo "[cargo] installing…"
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+fi
+
+
+#
+# docker
+#
+
+if ! which zsh >/dev/null 2>&1; then
+  echo "[docker] installing…"
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sh get-docker.sh
+  rm get-docker.sh
 fi
 
 
