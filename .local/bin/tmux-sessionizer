@@ -3,7 +3,7 @@
 declare -A SEARCHING_DIRS # path / depth search
 SEARCHING_DIRS["${HOME}/Projects/asso"]="2"
 SEARCHING_DIRS["${HOME}/Projects/work"]="1"
-SEARCHING_DIRS["${HOME}/Projects/personnal"]="2"
+SEARCHING_DIRS["${HOME}/Projects/personnal"]="1"
 
 DIRS="${HOME}/.dotfiles"
 for DIR in "${!SEARCHING_DIRS[@]}"; do
