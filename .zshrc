@@ -33,6 +33,13 @@ setopt hist_ignore_dups
 setopt hist_find_no_dups
 
 
+# setup 
+
+source ${HOME}/.nix-profile/etc/profile.d/nix.sh
+
+eval "$('/home/jg/.miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+
+
 # environement variables
 
 export FZF_DEFAULT_OPTS=" \
@@ -70,11 +77,6 @@ eval "$(fzf --zsh)"
 eval "$(zoxide init zsh)"
 
 
-# setup 
-
-source ${HOME}/.nix-profile/etc/profile.d/nix.sh
-
-eval "$('/home/jg/.miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 
 # fix keyboard issues
 
