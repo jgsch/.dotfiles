@@ -1,0 +1,124 @@
+set -e
+
+DEST=$1
+if [[ ! -d ${DEST} ]]; then
+  echo "Destination '${DEST}' does not exist"
+  exit 1
+fi
+
+DRY_RUN=0
+RESTORE=0
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+  --dry-run)
+    DRY_RUN=1
+    ;;
+  --restore)
+    RESTORE=1
+    ;;
+  --*)
+    echo "Illegal option $1"
+    ;;
+  esac
+  shift $(($# > 0 ? 1 : 0))
+done
+
+copy() {
+  command="rsync -a --update $1 $2"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo ${command}
+  else
+    echo + ${command}
+    eval ${command}
+  fi
+
+}
+
+HOME_FOLDERS=(
+  "Documents"
+  "Ebooks"
+  "Music"
+  "Pictures"
+  "Projects"
+)
+
+VIDEO_FOLDERS=(
+  "shorts"
+  "series"
+)
+
+CONFIGS_BACKUP_PATH="${DEST}/Backup/pc"
+
+CONFIGS=(
+  # "BraveSoftware"
+  "celluloid"
+  "keepassxc"
+  # "Ferdium"
+  # "FreeTube"
+  "nicotine"
+  # "obsidian"
+  "transmission"
+  # "vlc"
+)
+
+OTHER_CONFIGS=(
+  # ".librewolf"
+  ".ssh"
+)
+
+FILES=(
+  ".zsh_history"
+)
+
+backup() {
+  echo Backup home folders
+
+  for ITEM in "${HOME_FOLDERS[@]}"; do
+    copy "${HOME}/${ITEM}" "${DEST}/"
+  done
+
+  for ITEM in "${VIDEO_FOLDERS[@]}"; do
+    copy "${HOME}/Videos/${ITEM}" "${DEST}/Videos"
+  done
+
+  mkdir -p ${CONFIGS_BACKUP_PATH}
+
+  echo Backup configs folders and files
+
+  for ITEM in "${CONFIGS[@]}"; do
+    copy "${HOME}/.config/${ITEM}" "${CONFIGS_BACKUP_PATH}/_.config/"
+  done
+
+  for ITEM in "${OTHER_CONFIGS[@]}"; do
+    copy "${HOME}/${ITEM}/" "${CONFIGS_BACKUP_PATH}/_${ITEM}"
+  done
+}
+
+restore() {
+  for ITEM in "${HOME_FOLDERS[@]}"; do
+    copy "${DEST}/${ITEM}" "${HOME}"
+  done
+
+  for ITEM in "${VIDEO_FOLDERS[@]}"; do
+    copy "${DEST}/Videos/${ITEM}" "${HOME}/Videos"
+  done
+
+  for ITEM in "${CONFIGS[@]}"; do
+    copy "${CONFIGS_BACKUP_PATH}/_.config/${ITEM}" "${HOME}/.config/"
+  done
+
+  for ITEM in "${OTHER_CONFIGS[@]}"; do
+    copy "${CONFIGS_BACKUP_PATH}/_${ITEM}/" "${HOME}/${ITEM}"
+  done
+
+  for ITEM in "${FILES[@]}"; do
+    copy "${CONFIGS_BACKUP_PATH}/_${ITEM}/" "${HOME}/${ITEM}"
+  done
+}
+
+if [ "$RESTORE" -eq 1 ]; then
+  restore
+else
+  backup
+fi
