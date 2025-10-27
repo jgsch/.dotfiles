@@ -155,6 +155,7 @@ git config --global core.editor "nvim"
 git config --global alias.car "commit --amend --no-edit"
 git config --global alias.unstage "reset"
 git config --global alias.ucommit "reset --soft HEAD^"
+git config pull.rebase true
 
 #
 # setup zsh
