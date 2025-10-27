@@ -70,6 +70,7 @@ DESKTOP_APPS=(
   nixpkgs#localsend
   nixpkgs#nicotine-plus
   nixpkgs#papirus-icon-theme
+  nuxpkgs#puddletag
   nixpkgs#transmission_4
   nixpkgs#signal-desktop
   nixpkgs#vscodium
