@@ -62,7 +62,7 @@ PACKAGES=(
 )
 
 DESKTOP_APPS=(
-  nixpkgs#celluloid
+  nixpkgs#amberol
   nixpkgs#foliate
   nixpkgs#keepassxc
   nixpkgs#onlyoffice-desktopeditors
@@ -70,7 +70,7 @@ DESKTOP_APPS=(
   nixpkgs#localsend
   nixpkgs#nicotine-plus
   nixpkgs#papirus-icon-theme
-  nuxpkgs#puddletag
+  nixpkgs#puddletag
   nixpkgs#transmission_4
   nixpkgs#signal-desktop
   nixpkgs#vscodium
@@ -82,10 +82,14 @@ ADD=""
 for PACKAGE in "${PACKAGES[@]}"; do
   ADD="${ADD} ${PACKAGE}"
 done
+
 if $DESKTOP; then
   for PACKAGE in "${DESKTOP_APPS[@]}"; do
     ADD="${ADD} ${PACKAGE}"
   done
+
+  echo "[dnf] installing celluloid"
+  sudo dnf install -y celluloid
 fi
 
 echo "[nix] installing requested packages…"
