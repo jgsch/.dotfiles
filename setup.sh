@@ -1,10 +1,14 @@
 set -e
 
 DESKTOP=false
+RUST=false
+DOCKER=false
 REINSTALL=false
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --desktop) DESKTOP=true ;;
+    --rust) RUST=true ;;
+    --docker) DOCKER=true ;;
     --reinstall) REINSTALL=true ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1"; usage; exit 1 ;;
@@ -61,39 +65,45 @@ PACKAGES=(
   nixpkgs#zoxide
 )
 
-DESKTOP_APPS=(
-  nixpkgs#amberol
-  nixpkgs#foliate
-  nixpkgs#keepassxc
-  nixpkgs#onlyoffice-desktopeditors
-  nixpkgs#gimp3
-  nixpkgs#localsend
-  nixpkgs#nicotine-plus
-  nixpkgs#papirus-icon-theme
-  nixpkgs#puddletag
-  nixpkgs#transmission_4
-  nixpkgs#signal-desktop
-  nixpkgs#vscodium
-  nixpkgs#ungoogled-chromium
-  github:0xc000022070/zen-browser-flake
-)
-
 ADD=""
 for PACKAGE in "${PACKAGES[@]}"; do
   ADD="${ADD} ${PACKAGE}"
 done
 
+echo "[nix] installing base packages…"
+nix --extra-experimental-features 'nix-command flakes' profile add $ADD
+
 if $DESKTOP; then
+  DESKTOP_APPS=(
+    nixpkgs#amberol
+    nixpkgs#foliate
+    nixpkgs#keepassxc
+    nixpkgs#onlyoffice-desktopeditors
+    nixpkgs#gimp3
+    nixpkgs#localsend
+    nixpkgs#nicotine-plus
+    nixpkgs#papirus-icon-theme
+    nixpkgs#puddletag
+    nixpkgs#transmission_4-gtk
+    nixpkgs#signal-desktop
+    nixpkgs#vscodium
+    nixpkgs#ungoogled-chromium
+    github:0xc000022070/zen-browser-flake
+  )
   for PACKAGE in "${DESKTOP_APPS[@]}"; do
     ADD="${ADD} ${PACKAGE}"
   done
 
-  echo "[dnf] installing celluloid"
-  sudo dnf install -y celluloid
+  echo "[dnf] installing cosmic-de"
+  sudo dnf install -y @cosmic-desktop-environment
+
+  echo "[dnf] installing packages"
+  sudo dnf install -y alacritty celluloid
+
+  echo "[nix] installing desktop packages…"
+  nix --extra-experimental-features 'nix-command flakes' profile add $ADD
 fi
 
-echo "[nix] installing requested packages…"
-nix --extra-experimental-features 'nix-command flakes' profile add $ADD
 
 #
 # miniconda
@@ -123,16 +133,18 @@ fi
 # rust
 #
 
-CARGO_DIR=${HOME}/.cargo
-
-if [[ "$REINSTALL" == "true" && -d "$CARGO_DIR" ]]; then
-  echo "[cargo] cleaning…"
-  rm -rf ${CARGO_DIR}
-fi
-
-if [[ ! -d ${CARGO_DIR} ]]; then
-  echo "[cargo] installing…"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+if $RUST; then
+  CARGO_DIR=${HOME}/.cargo
+  
+  if [[ "$REINSTALL" == "true" && -d "$CARGO_DIR" ]]; then
+    echo "[cargo] cleaning…"
+    rm -rf ${CARGO_DIR}
+  fi
+  
+  if [[ ! -d ${CARGO_DIR} ]]; then
+    echo "[cargo] installing…"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  fi
 fi
 
 
@@ -140,16 +152,18 @@ fi
 # docker
 #
 
-if ! which zsh >/dev/null 2>&1; then
-  echo "[docker] installing…"
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  sh get-docker.sh
-  rm get-docker.sh
+if $DOCKER; then
+  if ! which zsh >/dev/null 2>&1; then
+    echo "[docker] installing…"
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sh get-docker.sh
+    rm get-docker.sh
+  fi
 fi
 
 
 #
-# setup zsh
+# setup git
 # 
 #
 
@@ -170,12 +184,6 @@ echo "[zsh] setup…"
 sudo dnf install -y zsh
 ZSHPATH=$(which zsh)
 sudo usermod -s "$ZSHPATH" "$USER"
-
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-if [[ ! -d ${ZINIT_HOME} ]]; then
-  mkdir -p "$(dirname $ZINIT_HOME)"
-  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-fi
 
 #
 # setup dotfiles
