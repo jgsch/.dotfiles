@@ -1,0 +1,10 @@
+[
+    Home,
+    Documents,
+    Downloads,
+    Music,
+    Pictures,
+    Videos,
+    Path("/home/jg/Ebooks"),
+    Path("/home/jg/Projects"),
+]
