@@ -63,7 +63,7 @@ CONFIGS=(
 )
 
 OTHER_CONFIGS=(
-  # ".librewolf"
+  ".zen"
   ".ssh"
 )
 
