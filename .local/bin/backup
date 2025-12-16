@@ -51,15 +51,10 @@ VIDEO_FOLDERS=(
 CONFIGS_BACKUP_PATH="${DEST}/Backup/pc"
 
 CONFIGS=(
-  # "BraveSoftware"
   "celluloid"
   "keepassxc"
-  # "Ferdium"
-  # "FreeTube"
   "nicotine"
-  # "obsidian"
   "transmission"
-  # "vlc"
 )
 
 OTHER_CONFIGS=(

@@ -59,6 +59,7 @@ PACKAGES=(
   nixpkgs#pyright
   nixpkgs#starship
   nixpkgs#stow
+  nixpkgs#tealdeer
   nixpkgs#tmux
   nixpkgs#ripgrep
   nixpkgs#wget

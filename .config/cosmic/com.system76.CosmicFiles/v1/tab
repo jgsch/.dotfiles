@@ -1,11 +1,10 @@
 (
-    view: List,
     folders_first: true,
-    show_hidden: false,
-    sort_name: Name,
-    sort_direction: true,
     icon_sizes: (
         list: 50,
         grid: 50,
     ),
+    show_hidden: false,
+    single_click: false,
+    view: List,
 )

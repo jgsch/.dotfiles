@@ -1,6 +1,9 @@
 [selection]
 save_to_clipboard = true
 
+[env]
+TERM = "alacritty"
+
 [window]
 decorations = "None"
 padding.x = 8

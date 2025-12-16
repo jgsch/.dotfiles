@@ -1,12 +1,18 @@
 add_newline = false
 
-format = """$username$hostname$directory$git_branch$git_status$conda$python$rust$character"""
+format = """$username$hostname$directory$git_branch$git_status$nix_shell$python$rust$character"""
 right_format = """$all"""
 
 palette = "catppuccin_mocha"
 
 [git_branch]
 style = "bold red"
+
+[nix_shell]
+format = 'via [$symbol (\($name\))](bold blue) '
+symbol = "❄️"
+impure_msg = ""
+pure_msg = ""
 
 [directory]
 style = "bold lavender"

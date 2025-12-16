@@ -33,13 +33,6 @@ setopt hist_ignore_dups
 setopt hist_find_no_dups
 
 
-# setup 
-
-source ${HOME}/.nix-profile/etc/profile.d/nix.sh
-
-eval "$('/home/jg/.miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-
-
 # environement variables
 
 export FZF_DEFAULT_OPTS=" \
@@ -50,9 +43,12 @@ export FZF_DEFAULT_OPTS=" \
 --color=border:#313244,label:#CDD6F4"
 
 export PATH=${HOME}/.local/bin:${PATH}
-export PATH=${HOME}/.miniconda3/bin:${PATH}
 export PATH=${HOME}/.cargo/bin:$PATH
 export PATH=${HOME}/.zig:${PATH}
+
+export SSH_AUTH_SOCK=/run/user/${UID}/gcr/ssh
+
+export NH_FLAKE=${HOME}/.config/nix
 
 
 # aliases
@@ -66,7 +62,6 @@ alias vim="nvim"
 
 alias ts="tmux-sessionizer"
 
-alias activate="source .venv/bin/activate"
 alias uvp="uv pip"
 
 
@@ -76,12 +71,18 @@ eval "$(starship init zsh)"
 eval "$(fzf --zsh)"
 eval "$(zoxide init zsh)"
 
-
+eval "$(direnv hook zsh)"
+_direnv_hook
 
 # fix keyboard issues
 
-bindkey "\e[1;5D" backward-word  # Ctrl + Left
-bindkey "\e[1;5C" forward-word   # Ctrl + Right
-bindkey '\e[H'  beginning-of-line 
-bindkey '\e[F'  end-of-line
-bindkey '\e[3~' delete-char
+bindkey -e
+bindkey '^H' backward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^L' forward-word
+bindkey '^[[1;5C' forward-word
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+bindkey -r '\ea'
+
+WORDCHARS=''

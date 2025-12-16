@@ -9,6 +9,6 @@
         method: Some(TwoFinger),
         natural_scroll: Some(true),
         scroll_button: None,
-        scroll_factor: None,
+        scroll_factor: Some(4.0),
     )),
 )
