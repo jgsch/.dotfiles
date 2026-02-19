@@ -6,4 +6,5 @@
     Pictures,
     Videos,
     Path("/home/jg/Ebooks"),
+    Path("/home/jg/Projects"),
 ]

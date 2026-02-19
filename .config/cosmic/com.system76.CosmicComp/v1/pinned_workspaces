@@ -104,4 +104,34 @@
         tiling_enabled: false,
         id: Some("1b75c0d"),
     ),
+    (
+        output: (
+            name: "eDP-1",
+            edid: Some((
+                manufacturer: ('B', 'O', 'E'),
+                product: 1759,
+                serial: None,
+                manufacture_week: 1,
+                manufacture_year: 2016,
+                model_year: None,
+            )),
+        ),
+        tiling_enabled: false,
+        id: Some("17489f9"),
+    ),
+    (
+        output: (
+            name: "eDP-1",
+            edid: Some((
+                manufacturer: ('B', 'O', 'E'),
+                product: 1759,
+                serial: None,
+                manufacture_week: 1,
+                manufacture_year: 2016,
+                model_year: None,
+            )),
+        ),
+        tiling_enabled: true,
+        id: Some("1668d89"),
+    ),
 ]

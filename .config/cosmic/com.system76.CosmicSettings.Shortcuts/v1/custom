@@ -2,102 +2,9 @@
     (
         modifiers: [
             Super,
-            Shift,
-        ],
-        key: "3",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "d",
-    ): Move(Right),
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "6",
-    ): Disable,
-    (
-        modifiers: [
-            Alt,
-        ],
-        key: "4",
-    ): Workspace(4),
-    (
-        modifiers: [
-            Alt,
-        ],
-        key: "2",
-    ): Workspace(2),
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "1",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-            Shift,
-        ],
-        key: "9",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-            Shift,
-        ],
-        key: "h",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-            Shift,
-        ],
-        key: "2",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-            Shift,
-        ],
-        key: "5",
-    ): Disable,
-    (
-        modifiers: [
-            Ctrl,
-            Alt,
-        ],
-        key: "2",
-    ): MoveToWorkspace(2),
-    (
-        modifiers: [
-            Super,
         ],
         key: "m",
     ): Disable,
-    (
-        modifiers: [
-            Ctrl,
-            Alt,
-        ],
-        key: "3",
-    ): MoveToWorkspace(3),
-    (
-        modifiers: [
-            Ctrl,
-            Alt,
-        ],
-        key: "1",
-    ): MoveToWorkspace(1),
-    (
-        modifiers: [
-            Ctrl,
-            Alt,
-        ],
-        key: "4",
-    ): MoveToWorkspace(4),
     (
         modifiers: [
             Ctrl,
@@ -107,87 +14,48 @@
     ): MoveToWorkspace(5),
     (
         modifiers: [
+            Ctrl,
             Alt,
-        ],
-        key: "5",
-    ): Workspace(5),
-    (
-        modifiers: [
-            Alt,
-        ],
-        key: "section",
-    ): Workspace(7),
-    (
-        modifiers: [
-            Super,
         ],
         key: "2",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-            Shift,
-        ],
-        key: "7",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-            Alt,
-        ],
-        key: "j",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-        ],
-    ): System(Launcher),
-    (
-        modifiers: [
-            Alt,
-        ],
-        key: "3",
-    ): Workspace(3),
-    (
-        modifiers: [
-            Super,
-            Shift,
-        ],
-        key: "1",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-            Alt,
-        ],
-        key: "Up",
-    ): Disable,
+    ): MoveToWorkspace(2),
     (
         modifiers: [
             Ctrl,
             Alt,
         ],
-        key: "6",
-    ): MoveToWorkspace(6),
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "3",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-            Alt,
-        ],
-        key: "Down",
-    ): Disable,
+        key: "1",
+    ): MoveToWorkspace(1),
     (
         modifiers: [
             Super,
             Shift,
         ],
         key: "Left",
+    ): Disable,
+    (
+        modifiers: [
+            Alt,
+        ],
+        key: "2",
+    ): Workspace(6),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "d",
+    ): Move(Right),
+    (
+        modifiers: [
+            Alt,
+        ],
+        key: "section",
+    ): Workspace(4),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "1",
     ): Disable,
     (
         modifiers: [
@@ -198,42 +66,21 @@
     ): MoveToWorkspace(8),
     (
         modifiers: [
-            Super,
-        ],
-        key: "s",
-    ): Maximize,
-    (
-        modifiers: [
-            Super,
-            Shift,
-        ],
-        key: "4",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "a",
-    ): Move(Left),
-    (
-        modifiers: [
-            Super,
             Alt,
         ],
-        key: "k",
-    ): Disable,
-    (
-        modifiers: [
-            Ctrl,
-            Alt,
-        ],
-        key: "9",
-    ): MoveToWorkspace(9),
+        key: "e",
+    ): Workspace(2),
     (
         modifiers: [
             Alt,
         ],
-        key: "1",
+        key: "q",
+    ): Workspace(9),
+    (
+        modifiers: [
+            Alt,
+        ],
+        key: "w",
     ): Workspace(1),
     (
         modifiers: [
@@ -247,34 +94,49 @@
             Super,
             Shift,
         ],
-        key: "Right",
+        key: "1",
+    ): Disable,
+    (
+        modifiers: [
+            Alt,
+        ],
+        key: "1",
+    ): Workspace(5),
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "2",
     ): Disable,
     (
         modifiers: [
             Super,
             Shift,
         ],
-        key: "l",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "7",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "4",
+        key: "5",
     ): Disable,
     (
         modifiers: [
             Ctrl,
             Alt,
         ],
-        key: "7",
-    ): MoveToWorkspace(7),
+        key: "q",
+    ): MoveToWorkspace(9),
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "9",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Alt,
+        ],
+        key: "Up",
+    ): Disable,
     (
         modifiers: [
             Super,
@@ -286,12 +148,174 @@
         modifiers: [
             Super,
         ],
+    ): System(Launcher),
+    (
+        modifiers: [
+            Super,
+        ],
         key: "5",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "3",
     ): Disable,
     (
         modifiers: [
             Alt,
         ],
+        key: "r",
+    ): Workspace(3),
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "7",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Alt,
+        ],
+        key: "k",
+    ): Disable,
+    (
+        modifiers: [
+            Ctrl,
+            Alt,
+        ],
+        key: "3",
+    ): MoveToWorkspace(3),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "8",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "7",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "4",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "3",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "2",
+    ): Disable,
+    (
+        modifiers: [
+            Ctrl,
+            Alt,
+        ],
         key: "6",
-    ): Workspace(6),
+    ): MoveToWorkspace(6),
+    (
+        modifiers: [
+            Alt,
+        ],
+        key: "3",
+    ): Workspace(7),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "a",
+    ): Move(Left),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "6",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "l",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Alt,
+        ],
+        key: "j",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "h",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "9",
+    ): Disable,
+    (
+        modifiers: [
+            Alt,
+        ],
+        key: "4",
+    ): Workspace(8),
+    (
+        modifiers: [
+            Ctrl,
+            Alt,
+        ],
+        key: "4",
+    ): MoveToWorkspace(4),
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "Right",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "s",
+    ): Maximize,
+    (
+        modifiers: [
+            Super,
+            Alt,
+        ],
+        key: "Down",
+    ): Disable,
+    (
+        modifiers: [
+            Ctrl,
+            Alt,
+        ],
+        key: "7",
+    ): MoveToWorkspace(7),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "4",
+    ): Disable,
 }
