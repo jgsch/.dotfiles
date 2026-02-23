@@ -1,5 +1,5 @@
 {
-  description = "A flake";
+  description = "NixOS configuration for laptop and desktop";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
@@ -18,36 +18,40 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    catppuccin.url = "github:catppuccin/nix";
+    catppuccin = {
+      url = "github:catppuccin/nix/release-25.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, nur, transmission-4-0-5-nixpkgs, catppuccin, ... }@inputs:
   let
     system = "x86_64-linux";
     transmission405NixPkgs = import transmission-4-0-5-nixpkgs { inherit system; };
+
+    # Modules shared by all hosts (flake-level modules like NUR, catppuccin, etc.)
+    sharedModules = [
+      nur.modules.nixos.default
+      catppuccin.nixosModules.catppuccin
+      ({ pkgs, ... }: {
+        environment.systemPackages = [
+          transmission405NixPkgs.transmission_4-gtk
+          pkgs.nur.repos.Ev357.helium
+        ];
+      })
+    ];
   in {
     nixosConfigurations = {
-      xyz = nixpkgs.lib.nixosSystem {
+      laptop = nixpkgs.lib.nixosSystem {
         inherit system;
+        specialArgs = { inherit inputs system; };
+        modules = [ ./hosts/laptop ] ++ sharedModules;
+      };
 
-        specialArgs = {
-          inherit inputs system;
-        };
-
-        modules = [
-          ./configuration.nix
-
-          nur.modules.nixos.default
-
-	  catppuccin.nixosModules.catppuccin
-
-          ({ pkgs, ... }: {
-            environment.systemPackages = [
-              transmission405NixPkgs.transmission_4-gtk
-              pkgs.nur.repos.Ev357.helium
-            ];
-          })
-        ];
+      desktop = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs system; };
+        modules = [ ./hosts/desktop ] ++ sharedModules;
       };
     };
   };

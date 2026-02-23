@@ -1,33 +1,26 @@
 { config, pkgs, inputs, ... }:
 
-
-
-let
-  androidComposition = pkgs.androidenv.composeAndroidPackages {
-    platformVersions = [ "35" ];  # Just the one you need
-    buildToolsVersions = [ "35.0.0" ];
-    includeEmulator = true;
-    includeSystemImages = true;
-    systemImageTypes = [ "google_apis_playstore" ];  # Just one type
-    abiVersions = [ "x86_64" ];  # Just one architecture
-  };
-in
 {
-  imports =
-    [ 
-      ./hardware-configuration.nix
-    ];
+  #
+  # Boot
+  #
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.supportedFilesystems = [ "ntfs" ];
 
   #
   # Networking
   #
 
-  networking.hostName = "xyz"; 
-
   networking.networkmanager.enable = true;
+
+  networking.firewall = {
+    enable = true;
+    # Localsend: 53317
+    allowedTCPPorts = [ 53317 ];
+    allowedUDPPorts = [ 53317 ];
+  };
 
   #
   # Locales
@@ -57,8 +50,8 @@ in
   # Configure console keymap
   console.keyMap = "fr_CH";
 
-  # 
-  # user
+  #
+  # User
   #
 
   users.users.jg = {
@@ -69,66 +62,50 @@ in
     packages = with pkgs; [];
   };
 
-
   environment.variables.NH_FLAKE = "/etc/nixos";
-  
+
   #
-  # Keyring
+  # SSH Agent
   #
 
-  services.gnome.gnome-keyring.enable = true;
-  services.gnome.gcr-ssh-agent.enable = true;
-  programs.seahorse.enable = true;
+  programs.ssh.startAgent = true;
+  services.gnome.gnome-keyring.enable = false;
 
-  # greetd login -> unlock keyring on login
-  security.pam.services.greetd.enableGnomeKeyring = true;
-  security.pam.services.login.enableGnomeKeyring = true;
+  environment.sessionVariables = {
+    SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
+  };
 
-  # IMPORTANT: stop other ssh-agents from “winning” SSH_AUTH_SOCK
-  programs.ssh.startAgent = false;
-
-  # Make every app (Wayland apps too) see the right agent socket
-  environment.sessionVariables.SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/gcr/ssh";
-  
   #
   # COSMIC desktop
   #
 
   services.desktopManager.cosmic.enable = true;
-  
   services.displayManager.cosmic-greeter.enable = true;
-  
   services.desktopManager.cosmic.xwayland.enable = true;
-  
   services.system76-scheduler.enable = true;
 
   #
   # Packages
   #
 
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  
-  # Fuse filesystem that dynamically populates contents of /bin 
-  # and /usr/bin/ so that it contains all executables from the PATH 
+  # Fuse filesystem that dynamically populates contents of /bin
+  # and /usr/bin/ so that it contains all executables from the PATH
   # of the requesting process.
   services.envfs.enable = true;
 
+  # for dynamically linked binaries
+  programs.nix-ld.enable = true;
 
-  # Android
-
-  nixpkgs.config.android_sdk.accept_license = true;
-
+  security.polkit.enable = true;
 
   environment.systemPackages = with pkgs; [
     #
     # cli
     #
+    appimage-run
     adwaita-icon-theme
-    android-tools
-    android-studio
-    androidComposition.androidsdk
     claude-code
     copilot-language-server
     curl
@@ -144,7 +121,10 @@ in
     ffmpeg
     imagemagick
     opencode
+    openssl
+    mise
     neovim
+    nmap
     nh
     nodejs_24
     ntfs3g
@@ -153,6 +133,7 @@ in
     lua-language-server
     pyright
     ruff
+    rsync
     starship
     stow
     stylua
@@ -161,6 +142,8 @@ in
     tree-sitter
     ripgrep
     (pkgs.python313.withPackages (ps: [ ps.mutagen ]))
+    poppler-utils
+    pre-commit
     python313
     python313Packages.pip
     wget
@@ -175,44 +158,58 @@ in
     amberol
     celluloid
     firefox
-    (pkgs.writeShellScriptBin "foliate" ''
-      exec env GDK_BACKEND=x11 ${pkgs.foliate}/bin/foliate "$@"
-    '')
+    (symlinkJoin {
+      name = "foliate";
+      paths = [ foliate ];
+      nativeBuildInputs = [ makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/foliate \
+          --set GDK_BACKEND x11
+      '';
+    })
     keepassxc
     onlyoffice-desktopeditors
     gimp3
     gnome-keyring
     localsend
     loupe
+    mkvtoolnix
     nicotine-plus
     papers
     papirus-icon-theme
+    podman
     protonvpn-gui
     puddletag
     transmission_4-gtk
+    # rpi-imager
+    tor-browser
     signal-desktop
     inputs.zen-browser.packages.${pkgs.system}.beta
     vlc
     vscodium
     #winboat
   ];
-  
+
+  #
+  # Programs
+  #
+
   programs.zsh = {
     enable = true;
   };
-  
+
   programs.neovim = {
     enable = true;
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
   };
-  
+
   programs.starship = {
   };
 
-   programs.git = {
-     enable = true;
+  programs.git = {
+    enable = true;
 
     config = {
       core = {
@@ -231,14 +228,23 @@ in
     };
   };
 
+  #
+  # Fonts
+  #
+
   fonts.packages = with pkgs; [
     nerd-fonts.sauce-code-pro
   ];
-  
-  boot.supportedFilesystems = [ "ntfs" ];
-  services.udisks2.enable = true;
-    
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  system.stateVersion = "25.11"; 
+  #
+  # Services
+  #
+
+  services.udisks2.enable = true;
+
+  #
+  # Nix settings
+  #
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 }
