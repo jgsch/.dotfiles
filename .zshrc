@@ -46,8 +46,6 @@ export PATH=${HOME}/.local/bin:${PATH}
 export PATH=${HOME}/.cargo/bin:$PATH
 export PATH=${HOME}/.zig:${PATH}
 
-export SSH_AUTH_SOCK=/run/user/${UID}/gcr/ssh
-
 export NH_FLAKE=${HOME}/.config/nix
 
 
