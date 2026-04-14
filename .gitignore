@@ -1,1 +1,3 @@
 .config/tmux/plugins
+*sync-conflict*
+.stfolder/
