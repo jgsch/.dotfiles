@@ -1,0 +1,12 @@
+USERNAME="$1"
+URL="https://soundcloud.com/oembed?format=json&url=https://soundcloud.com/${USERNAME}"
+
+ID=$(curl -s "$URL" | grep -oP 'api\.soundcloud\.com%2Fusers%2F\K[0-9]+')
+
+if [ -z "$ID" ]; then
+  echo "Could not find user ID for: $USERNAME"
+  exit 1
+fi
+
+echo "User ID: $ID"
+echo "RSS Feed: http://feeds.soundcloud.com/users/soundcloud:users:${ID}/sounds.rss"
