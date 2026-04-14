@@ -75,6 +75,11 @@
     SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
   };
 
+  services.printing.enable = true;
+  services.printing.drivers = [
+    pkgs.brlaser  # Brother laser printers
+  ];
+
   #
   # COSMIC desktop
   #
@@ -98,7 +103,15 @@
   # for dynamically linked binaries
   programs.nix-ld.enable = true;
 
+  # for dynamically linked binaries
+  programs.nix-ld.enable = true;
+
   security.polkit.enable = true;
+
+  # Android
+
+  nixpkgs.config.android_sdk.accept_license = true;
+
 
   environment.systemPackages = with pkgs; [
     #
