@@ -103,9 +103,6 @@
   # for dynamically linked binaries
   programs.nix-ld.enable = true;
 
-  # for dynamically linked binaries
-  programs.nix-ld.enable = true;
-
   security.polkit.enable = true;
 
   # Android
