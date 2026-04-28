@@ -1,0 +1,14 @@
+#!/bin/bash
+
+USERNAME="$1"
+URL="https://www.youtube.com/@${USERNAME}"
+
+ID=$(curl -s "$URL" | grep -oP 'href="https://www\.youtube\.com/channel/\K[^"]+' | head -1)
+
+if [ -z "$ID" ]; then
+  echo "Could not find channel ID for: $USERNAME"
+  exit 1
+fi
+
+echo "Channel ID: $ID"
+echo "RSS Feed: https://www.youtube.com/feeds/videos.xml?channel_id=${ID}"
