@@ -1,5 +1,16 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
+let
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
+in
 {
   #
   # Boot
@@ -57,9 +68,12 @@
   users.users.jg = {
     isNormalUser = true;
     description = "jg";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     shell = pkgs.zsh;
-    packages = with pkgs; [];
+    packages = with pkgs; [ ];
   };
 
   environment.variables.NH_FLAKE = "/etc/nixos";
@@ -77,7 +91,7 @@
 
   services.printing.enable = true;
   services.printing.drivers = [
-    pkgs.brlaser  # Brother laser printers
+    pkgs.brlaser # Brother laser printers
   ];
 
   #
@@ -108,7 +122,6 @@
   # Android
 
   nixpkgs.config.android_sdk.accept_license = true;
-
 
   environment.systemPackages = with pkgs; [
     #
@@ -151,7 +164,10 @@
     tmux
     tree-sitter
     ripgrep
-    (pkgs.python313.withPackages (ps: [ ps.mutagen ]))
+    (pkgs.python313.withPackages (ps: [
+      ps.mutagen
+      ps.yt-dlp
+    ]))
     poppler-utils
     pre-commit
     python313
@@ -256,5 +272,8 @@
   # Nix settings
   #
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 }
