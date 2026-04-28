@@ -3,14 +3,11 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    
-    transmission-4-0-5-nixpkgs = {
-      url = "github:NixOS/nixpkgs/eb04659fc2623c05643ed14633423758d3c6c6a4";
     };
 
     zen-browser = {
@@ -24,35 +21,37 @@
     };
   };
 
-  outputs = { self, nixpkgs, nur, transmission-4-0-5-nixpkgs, catppuccin, ... }@inputs:
-  let
-    system = "x86_64-linux";
-    transmission405NixPkgs = import transmission-4-0-5-nixpkgs { inherit system; };
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+      nur,
+      catppuccin,
+      home-manager,
+      ...
+    }@inputs:
+    let
+      system = "x86_64-linux";
 
-    # Modules shared by all hosts (flake-level modules like NUR, catppuccin, etc.)
-    sharedModules = [
-      nur.modules.nixos.default
-      catppuccin.nixosModules.catppuccin
-      ({ pkgs, ... }: {
-        environment.systemPackages = [
-          transmission405NixPkgs.transmission_4-gtk
-          pkgs.nur.repos.Ev357.helium
-        ];
-      })
-    ];
-  in {
-    nixosConfigurations = {
-      laptop = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = { inherit inputs system; };
-        modules = [ ./hosts/laptop ] ++ sharedModules;
-      };
+      sharedModules = [
+        nur.modules.nixos.default
+        catppuccin.nixosModules.catppuccin
+      ];
+    in
+    {
+      nixosConfigurations = {
+        laptop = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit inputs system nixpkgs-unstable; };
+          modules = [ ./hosts/laptop ] ++ sharedModules;
+        };
 
-      desktop = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = { inherit inputs system; };
-        modules = [ ./hosts/desktop ] ++ sharedModules;
+        desktop = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit inputs system nixpkgs-unstable; };
+          modules = [ ./hosts/desktop ] ++ sharedModules;
+        };
       };
     };
-  };
 }
