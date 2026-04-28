@@ -21,6 +21,8 @@ bindings =  [
   { mouse = "Right", action= "PasteSelection" }
 ]
 
+[terminal]
+osc52 = "OnlyCopy"
 
 [font]
 normal = {"family"="SauceCodeProNerdFont", "style"="Medium"}
