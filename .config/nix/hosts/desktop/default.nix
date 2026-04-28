@@ -2,7 +2,8 @@
 
 let
   unstable = import inputs.nixpkgs-unstable { inherit (pkgs) system; };
-in {
+in
+{
   imports = [
     ../../common
     ../../common/android.nix
@@ -22,11 +23,11 @@ in {
 
   system.stateVersion = "25.11";
 
-services.syncthing = {
-  enable = true;
-  user = "jg";
-  dataDir = "/home/jg/.local/share/syncthing";
-  guiAddress = "127.0.0.1:8384";
-  openDefaultPorts = true;  # Open firewall ports
-};
+  services.syncthing = {
+    enable = true;
+    user = "jg";
+    dataDir = "/home/jg/.local/share/syncthing";
+    guiAddress = "127.0.0.1:8384";
+    openDefaultPorts = true; # Open firewall ports
+  };
 }
