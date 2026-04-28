@@ -143,7 +143,7 @@ in
     gcc
     ffmpeg
     imagemagick
-    opencode
+    unstable.opencode
     openssl
     mise
     neovim
@@ -175,6 +175,7 @@ in
     wget
     uv
     unzip
+    wl-clipboard
     zoxide
     zsh
     #
@@ -205,11 +206,13 @@ in
     papirus-icon-theme
     podman
     protonvpn-gui
+    nur.repos.Ev357.helium
     puddletag
     transmission_4-gtk
     # rpi-imager
     tor-browser
     signal-desktop
+    sshfs-fuse
     inputs.zen-browser.packages.${pkgs.system}.beta
     vlc
     vscodium
