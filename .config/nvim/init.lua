@@ -376,6 +376,8 @@ require("lazy").setup({
 			formatters_by_ft = {
 				python = { "ruff_format", "ruff_organize_imports" },
 				lua = { "stylua" },
+				kotlin = { "ktfmt" },
+				nix = { "nixfmt" },
 			},
 		},
 	},
@@ -399,6 +401,7 @@ require("lazy").setup({
 				"query",
 				"vim",
 				"vimdoc",
+				"nix",
 			},
 			auto_install = true,
 			highlight = {
