@@ -274,6 +274,15 @@ in
 
   fonts.packages = with pkgs; [
     nerd-fonts.sauce-code-pro
+    (pkgs.stdenvNoCC.mkDerivation {
+      name = "custom-fonts";
+      src = ./fonts;
+      dontUnpack = true;
+      installPhase = ''
+        mkdir -p $out/share/fonts/truetype
+        cp $src/*.ttf $src/*.otf $out/share/fonts/truetype/
+      '';
+    })
   ];
 
   #
