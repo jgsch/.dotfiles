@@ -4,7 +4,7 @@
         list: 50,
         grid: 50,
     ),
-    show_hidden: false,
+    show_hidden: true,
     single_click: false,
     view: List,
 )
