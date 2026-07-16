@@ -116,6 +116,11 @@ in
 
   # for dynamically linked binaries
   programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    wayland
+    libxkbcommon
+    libglvnd
+  ];
 
   security.polkit.enable = true;
 
