@@ -169,10 +169,12 @@ in
     tmux
     tree-sitter
     ripgrep
+    rtk
     (pkgs.python313.withPackages (ps: [
       ps.mutagen
       ps.yt-dlp
     ]))
+    pciutils
     poppler-utils
     pre-commit
     python313
@@ -206,10 +208,13 @@ in
     localsend
     loupe
     mkvtoolnix
+    orca-slicer
     nicotine-plus
     papers
     papirus-icon-theme
+    parted
     podman
+    podman-compose
     protonvpn-gui
     nur.repos.Ev357.helium
     puddletag
@@ -221,6 +226,7 @@ in
     inputs.zen-browser.packages.${pkgs.system}.beta
     vlc
     vscodium
+    wimlib
     #winboat
   ];
 
