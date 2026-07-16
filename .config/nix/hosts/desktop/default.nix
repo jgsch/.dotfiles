@@ -21,8 +21,6 @@ in
 
   networking.hostName = "desktop";
 
-  system.stateVersion = "25.11";
-
   services.syncthing = {
     enable = true;
     user = "jg";
