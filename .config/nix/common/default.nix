@@ -79,15 +79,15 @@ in
   environment.variables.NH_FLAKE = "/etc/nixos";
 
   #
-  # SSH Agent
+  # Keyring
   #
 
-  programs.ssh.startAgent = true;
-  services.gnome.gnome-keyring.enable = false;
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.cosmic-greeter.enableGnomeKeyring = true;
 
-  environment.sessionVariables = {
-    SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
-  };
+  #
+  # Printer
+  #
 
   services.printing.enable = true;
   services.printing.drivers = [
@@ -146,6 +146,7 @@ in
     fzf
     git
     gcc
+    gnumake
     ffmpeg
     imagemagick
     unstable.opencode
@@ -177,8 +178,8 @@ in
     pciutils
     poppler-utils
     pre-commit
-    python313
-    python313Packages.pip
+    python314
+    python314Packages.pip
     wget
     uv
     unzip
