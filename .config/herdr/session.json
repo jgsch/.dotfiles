@@ -1,0 +1,96 @@
+{
+  "version": 3,
+  "workspaces": [
+    {
+      "id": "w6",
+      "custom_name": null,
+      "identity_cwd": "/home/jg",
+      "public_pane_numbers": {
+        "4": 3,
+        "1": 1,
+        "2": 2
+      },
+      "next_public_pane_number": 4,
+      "public_tab_numbers": [
+        1
+      ],
+      "next_public_tab_number": 2,
+      "tabs": [
+        {
+          "custom_name": null,
+          "layout": {
+            "Split": {
+              "direction": "Horizontal",
+              "ratio": 0.5925926,
+              "first": {
+                "Split": {
+                  "direction": "Vertical",
+                  "ratio": 0.63265306,
+                  "first": {
+                    "Pane": 1
+                  },
+                  "second": {
+                    "Pane": 4
+                  }
+                }
+              },
+              "second": {
+                "Pane": 2
+              }
+            }
+          },
+          "panes": {
+            "1": {
+              "cwd": "/home/jg"
+            },
+            "2": {
+              "cwd": "/home/jg"
+            },
+            "4": {
+              "cwd": "/home/jg/.config"
+            }
+          },
+          "zoomed": false,
+          "focused": 2,
+          "root_pane": 1
+        }
+      ],
+      "active_tab": 0
+    },
+    {
+      "id": "w7",
+      "custom_name": null,
+      "identity_cwd": "/home/jg/.config",
+      "public_pane_numbers": {
+        "3": 1
+      },
+      "next_public_pane_number": 2,
+      "public_tab_numbers": [
+        1
+      ],
+      "next_public_tab_number": 2,
+      "tabs": [
+        {
+          "custom_name": null,
+          "layout": {
+            "Pane": 3
+          },
+          "panes": {
+            "3": {
+              "cwd": "/home/jg/.config"
+            }
+          },
+          "zoomed": false,
+          "focused": 3,
+          "root_pane": 3
+        }
+      ],
+      "active_tab": 0
+    }
+  ],
+  "active": 1,
+  "selected": 1,
+  "sidebar_width": null,
+  "sidebar_section_split": null,
+  "collapsed_space_keys": []
+}

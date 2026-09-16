@@ -208,6 +208,7 @@ in
           --set GDK_BACKEND x11
       '';
     })
+    unstable.herdr
     keepassxc
     onlyoffice-desktopeditors
     gimp3

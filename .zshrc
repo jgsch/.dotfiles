@@ -69,6 +69,7 @@ eval "$(starship init zsh)"
 eval "$(fzf --zsh)"
 eval "$(zoxide init zsh)"
 eval "$(mise activate zsh)"
+source <(herdr completion zsh)
 
 # fix keyboard issues
 
