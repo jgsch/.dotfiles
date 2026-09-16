@@ -12,6 +12,10 @@ let
   };
 in
 {
+  imports = [
+    ./cosmic-ext-niri.nix
+  ];
+
   #
   # Boot
   #
@@ -71,6 +75,7 @@ in
     extraGroups = [
       "networkmanager"
       "wheel"
+      "libvirtd"
     ];
     shell = pkgs.zsh;
     packages = with pkgs; [ ];
@@ -191,6 +196,7 @@ in
     #
     alacritty
     amberol
+    brightnessctl
     celluloid
     firefox
     (symlinkJoin {
@@ -224,6 +230,7 @@ in
     tor-browser
     signal-desktop
     sshfs-fuse
+    sunsetr
     inputs.zen-browser.packages.${pkgs.system}.beta
     vlc
     vscodium

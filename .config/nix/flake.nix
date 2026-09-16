@@ -19,6 +19,16 @@
       url = "github:catppuccin/nix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    cosmic-ext-extra-sessions = {
+      url = "github:Drakulix/cosmic-ext-extra-sessions";
+      flake = false;
+    };
+
+    cosmic-ext-alternative-startup = {
+      url = "github:Drakulix/cosmic-ext-alternative-startup";
+      flake = false;
+    };
   };
 
   outputs =
