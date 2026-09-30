@@ -215,6 +215,7 @@ in
     gnome-keyring
     localsend
     loupe
+    libnotify
     mkvtoolnix
     orca-slicer
     nicotine-plus
@@ -299,6 +300,11 @@ in
   #
 
   services.udisks2.enable = true;
+  services.udisks2.settings."mount_options.conf" = {
+    defaults = {
+      ntfs_drivers = "ntfs,ntfs3";
+    };
+  };
 
   #
   # Nix settings
