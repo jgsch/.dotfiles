@@ -1106,8 +1106,6 @@ require("lazy").setup({
 				cmd = { "lua-language-server" },
 			})
 			vim.lsp.enable("lua_ls")
-
-			vim.lsp.enable("copilot")
 		end,
 	},
 }, {
