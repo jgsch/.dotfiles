@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+
+# Auto-hide niri scratchpads when they lose focus.
+#
+# Usage:
+# 	scratchpad-autohide app_id=workspace_name [app_id=workspace_name ...]
+# Example:
+# 	spawn-at-startup "sh" "-c" "~/.local/bin/scratchpad-autohide com.system76.CosmicFiles=stash-files org.keepassxc.KeePassXC=stash-password"
+#
+# Behaviour:
+# 	- When a watched scratchpad window loses focus, it is moved back to its
+# 	  stash workspace and the workspace is pushed to the last position.
+# 	- Focus moving to another window of the SAME app (its own dialogs, popups)
+# 	  does not hide it.
+# 	- Switching workspace or output hides it.
+
+SELF_DIR="$(dirname "$(readlink -f "$0")")"
+LOCK_FILE="/tmp/.scratchpad-autohide.lock"
+
+if [[ $# -eq 0 ]]; then
+	echo "error: usage: scratchpad-autohide app_id=workspace_name [app_id=workspace_name ...]" >&2
+	exit 1
+fi
+
+WATCHED=()
+for pair in "$@"; do
+	if [[ "$pair" != *=* || -z "${pair%%=*}" || -z "${pair##*=}" ]]; then
+		echo "error: bad argument '$pair', expected app_id=workspace_name" >&2
+		exit 1
+	fi
+	WATCHED+=("$(echo "${pair%%=*}" | tr '[:upper:]' '[:lower:]')=${pair##*=}")
+done
+
+# One instance only.
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+	echo "error: scratchpad-autohide is already running (lock: $LOCK_FILE)" >&2
+	exit 1
+fi
+
+# find_id <app_id_lower> -> echo window id of that app, if it has a window
+find_id() {
+	niri msg --json windows | jq -r --arg a "$1" 'first(.[] | select((.app_id // "" | ascii_downcase) == $a) | .id) // empty'
+}
+
+# window_app <id> -> lowercase app_id of the window
+window_app() {
+	niri msg --json windows | jq -r --argjson id "$1" '.[] | select(.id == $id) | .app_id // ""' | head -n 1 | tr '[:upper:]' '[:lower:]'
+}
+
+# hide_scratchpad <app_id_lower> <workspace_name>
+hide_scratchpad() {
+	local app="$1" ws="$2" id cur_ws stash_idx cur_idx
+	id=$(find_id "$app") || return 0
+	[[ -n "$id" ]] || return 0
+	cur_ws=$(niri msg --json windows | jq -r --argjson id "$id" '.[] | select(.id == $id) | .workspace_id' | head -n 1)
+	# Already on the stashed workspace? nothing to do.
+	stash_ws_id=$(niri msg -j workspaces | jq -r --arg ws "$ws" '.[] | select(.name == $ws) | .id' | head -n 1)
+	[[ "$cur_ws" == "$stash_ws_id" ]] && return 0
+	niri msg action move-window-to-workspace --window-id "$id" --focus false "$ws" >/dev/null 2>&1
+	# Only push the stash workspace back if it ended up active/focused.
+	if [[ "$(niri msg --json workspaces | jq -r --arg ws "$ws" '.[] | select(.name == $ws) | select(.is_focused == true or .is_active == true) | .id')" != "" ]]; then
+		niri msg action move-workspace-to-index --reference "$ws" 255
+	fi
+}
+
+# app_matches <app_id_lower> -> watched workspace name, if this app is watched
+app_watch_ws() {
+	for pair in "${WATCHED[@]}"; do
+		app="${pair%%=*}"
+		ws="${pair##*=}"
+		if [[ "$1" == "$app" ]]; then
+			echo "$ws"
+			return 0
+		fi
+	done
+	return 1
+}
+
+# state: currently focused window id ("" = no window)
+LAST_FOCUSED=""
+LAST_FOCUSED_APP_FOR_WS="" # workspace name whose scratchpad currently has focus, if any
+
+initialize_state() {
+	local focused_app ws
+	LAST_FOCUSED=$(niri msg --json windows | jq -r '.[] | select(.is_focused == true) | .id' | head -n 1)
+	focused_app=$(niri msg --json windows | jq -r '.[] | select(.is_focused == true) | .app_id // ""' | head -n 1 | tr '[:upper:]' '[:lower:]')
+	ws=$(app_watch_ws "$focused_app") || ws=""
+	LAST_FOCUSED_APP_FOR_WS="$ws"
+}
+
+initialize_state
+
+niri msg --json event-stream | while read -r line; do
+	event=$(jq -rc '. as $e
+		| if ($e | has("WindowFocusChanged")) then
+			"FOCUS \($e.WindowFocusChanged.id // "")"
+		  elif ($e | has("WindowOpenedOrChanged")) and ($e.WindowOpenedOrChanged.window.is_focused == true) then
+			# New windows take focus without a WindowFocusChanged event.
+			"FOCUS \($e.WindowOpenedOrChanged.window.id)"
+		  elif ($e | has("WorkspaceActivated")) then
+			"WSACT \($e.WorkspaceActivated.id // "")"
+		  else empty
+		  end' <<<"$line" 2>/dev/null)
+	[[ -n "$event" ]] || continue
+	read -r evtype evarg <<<"$event"
+
+	case "$evtype" in
+	FOCUS)
+		# Ignore repeats for the already focused window (e.g. title changes).
+		[[ "$evarg" == "$LAST_FOCUSED" ]] && continue
+		# A window gained focus. If the previously focused window was a watched
+		# scratchpad, hide it now.
+		if [[ -n "$LAST_FOCUSED_APP_FOR_WS" ]]; then
+			prev_app=$(window_app "$LAST_FOCUSED")
+			ws=$(app_watch_ws "$prev_app") || ws=""
+			if [[ "$ws" == "$LAST_FOCUSED_APP_FOR_WS" && -n "$(find_id "$prev_app")" ]]; then
+				# If focus went to another window of the SAME app, don't hide.
+				new_app=""
+				if [[ -n "$evarg" ]]; then
+					new_app=$(window_app "$evarg")
+				fi
+				if [[ "$new_app" != "$prev_app" ]]; then
+					hide_scratchpad "$prev_app" "$ws"
+				fi
+			fi
+			LAST_FOCUSED_APP_FOR_WS=""
+		fi
+		# Remember which watched scratchpad just gained focus, if any.
+		if [[ -n "$evarg" ]]; then
+			new_app=$(window_app "$evarg")
+			ws=$(app_watch_ws "$new_app") || ws=""
+			LAST_FOCUSED_APP_FOR_WS="$ws"
+		fi
+		LAST_FOCUSED="$evarg"
+		;;
+	WSACT)
+		# Workspace activated: if a watched scratchpad had focus on a workspace
+		# that is no longer the active one on its output, hide it.
+		if [[ -n "$LAST_FOCUSED_APP_FOR_WS" ]]; then
+			prev_app=$(window_app "$LAST_FOCUSED")
+			ws=$(app_watch_ws "$prev_app") || ws=""
+			if [[ "$ws" == "$LAST_FOCUSED_APP_FOR_WS" ]]; then
+				cws=$(niri msg --json windows | jq -r --argjson id "$LAST_FOCUSED" '.[] | select(.id == $id) | .workspace_id' | head -n 1)
+				active_here=$(niri msg -j workspaces | jq -r --argjson w "$cws" '.[] | select(.id == $w) | select(.is_active == true) | .id' | head -n 1)
+				if [[ "$active_here" == "" ]]; then
+					hide_scratchpad "$prev_app" "$ws"
+					LAST_FOCUSED_APP_FOR_WS=""
+				fi
+			fi
+		fi
+		;;
+	esac
+done

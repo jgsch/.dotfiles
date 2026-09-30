@@ -29,6 +29,16 @@ while [[ $# -gt 0 ]]; do
 		fi
 		;;
 
+	-w | --workspace)
+		if [[ -n "$2" && "$2" != -* ]]; then
+			STASH_WS="$2"
+			shift 2
+		else
+			echo "error: '-w' option should follow a workspace name" >&2
+			exit 1
+		fi
+		;;
+
 	-c)
 		if [[ -n "$2" ]]; then
 			LAUNCH_CMD="$2"
@@ -85,6 +95,12 @@ while [[ $# -gt 0 ]]; do
 		;;
 	esac
 done
+
+if [[ -z "$STASH_WS" ]]; then
+	echo "error: required option '-w' (target workspace name) not set" >&2
+	exit 1
+fi
+
 if [[ "$WINDOW_ID" != '' ]]; then
 	read -r output_id workspace_idx <<<"$(niri msg -j workspaces | jq -r --argjson workspace_id $workspace_id '.[] | select(.id == $workspace_id) | "\(.output) \(.idx)"')"
 fi
@@ -96,7 +112,7 @@ if [[ -n "$workspace_id" && "$ACTIVE_WORKSPACE" != $(niri msg -j workspaces | jq
 	# REMOVE
 	if [[ "$IS_FLOAT" = "true" || $(niri msg -j windows | jq -r "[.[] | select(.workspace_id == $workspace_id) | select(.layout.pos_in_scrolling_layout[0] == $column_idx)| .id] | length") = 1 ]]; then
 		niri msg action move-window-to-monitor --id "$WINDOW_ID" $ACTIVE_OUTPUT
-		niri msg action move-workspace-to-monitor --reference "stash" $ACTIVE_OUTPUT
+		niri msg action move-workspace-to-monitor --reference "$STASH_WS" $ACTIVE_OUTPUT
 		niri msg action focus-window --id "$WINDOW_ID"
 	else
 		if [[ $ACTIVE_OUTPUT != $output_id ]]; then
@@ -105,9 +121,9 @@ if [[ -n "$workspace_id" && "$ACTIVE_WORKSPACE" != $(niri msg -j workspaces | jq
 		niri msg action do-screen-transition
 		niri msg action focus-workspace $workspace_idx
 		niri msg action focus-column $(niri msg --json windows | jq -r ".[] | select(.id==$WINDOW_ID) | .layout.pos_in_scrolling_layout[0]")
-		niri msg action move-column-to-workspace --focus false "stash"
-		niri msg action move-workspace-to-monitor --reference "stash" $ACTIVE_OUTPUT
-		niri msg action focus-workspace "stash"
+		niri msg action move-column-to-workspace --focus false "$STASH_WS"
+		niri msg action move-workspace-to-monitor --reference "$STASH_WS" $ACTIVE_OUTPUT
+		niri msg action focus-workspace "$STASH_WS"
 		niri msg action focus-column $(niri msg --json windows | jq -r ".[] | select(.id==$WINDOW_ID) | .layout.pos_in_scrolling_layout[0]")
 		niri msg action move-column-to-workspace $ACTIVE_WORKSPACE_IDX
 
@@ -124,14 +140,14 @@ elif [[ -n "$workspace_id" && "$ACTIVE_WORKSPACE" == $(niri msg -j workspaces | 
 	idx=$(niri msg --json windows | jq -r ".[] | select(.is_focused==true) | .layout.pos_in_scrolling_layout[0]")
 	if [[ "$IS_FLOAT" = "false" && $widx = $idx || "$IS_FLOAT" = "true" && $(niri msg --json windows | jq -r ".[] | select(.id==$WINDOW_ID)| .is_focused") == true ]]; then
 		if [[ "$IS_FLOAT" = "false" ]]; then
-			niri msg action move-column-to-workspace --focus false "stash"
+			niri msg action move-column-to-workspace --focus false "$STASH_WS"
 			niri msg action focus-column $((column_idx > 1 ? column_idx - 1 : 1))
 		else
-			niri msg action move-window-to-workspace --window-id "$WINDOW_ID" --focus false "stash"
+			niri msg action move-window-to-workspace --window-id "$WINDOW_ID" --focus false "$STASH_WS"
 		fi
 	else
 		if [ "$IS_FLOAT" = "true" ]; then
-			niri msg action focus-window --id "$WINDOW_ID"
+			niri msg action move-window-to-workspace --window-id "$WINDOW_ID" --focus false "$STASH_WS"
 		else
 			if [[ "$idx" = "null" ]]; then
 				niri msg action switch-focus-between-floating-and-tiling
@@ -150,4 +166,4 @@ else
 		foot -o csd.size=0 -o colors-dark.alpha=0.8 -a "dropdown" tmux attach
 	fi
 fi
-niri msg action move-workspace-to-index --reference "stash" 255
+niri msg action move-workspace-to-index --reference "$STASH_WS" 255
