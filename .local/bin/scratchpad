@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		delete)
+			ACTION="delete"
+			if [[ -n "$2" && "$2" =~ ^[0-9]+$ ]]; then
+				sed -i "/^$2: /d" /tmp/.niri_ndrop
+				NUM_VAL="$2"
+				notify-send -a "niri-scratchpad" "Niri Scratchpad" "Delete Scratchpad $2 \nScratchpad Info:\n<tt>$( (echo 'scratchpad window_id app_id'; tr -d ':' < /tmp/.niri_ndrop)  | cut -d'.' -f1| column -t -o '|' )</tt>"
+				shift 2
+			else
+				echo "error: 'delete' command should follow an number" >&2
+				exit 1
+			fi
+			;;
+			
+		-t)
+			if [[ -n "$2" && "$2" != -* ]]; then
+				read -r WINDOW_ID workspace_id IS_FLOAT column_idx <<< "$(niri msg --json windows | jq -r --arg appid "$2" 'first(.[] | select(.title? | test($appid; "i"))) | "\(.id) \(.workspace_id) \(.is_floating) \(.layout.pos_in_scrolling_layout[0])"')"
+				T_VAL="$2"
+				shift 2 
+			else
+				echo "error: '-t' option should follow an argument" >&2
+				exit 1
+			fi
+			;;
+			
+		-c)
+			if [[ -n "$2" ]]; then
+				LAUNCH_CMD="$2"
+				shift 2
+			else
+				echo "error: '-c' option should follow a command" >&2
+				exit 1
+			fi
+			;;
+
+		-i|-id)
+			if [[ -n "$2" && "$2" != -* ]]; then
+				read -r WINDOW_ID workspace_id IS_FLOAT column_idx <<< "$(niri msg --json windows | jq -r --arg appid "$2" 'first(.[] | select((.app_id // "" | ascii_downcase) == ($appid | ascii_downcase))) | "\(.id) \(.workspace_id) \(.is_floating) \(.layout.pos_in_scrolling_layout[0])"')"
+				if [ "$2" = "dropdown" ]; then
+					is_dropdown=true
+				else
+					is_dropdown=false
+				fi
+				shift 2
+			else
+				echo "error: '-id' option should follow an argument." >&2
+				exit 1
+			fi
+			;;
+			
+		*)
+			if [[ "$1" =~ ^[0-9]+$ ]]; then
+				if WINDOW_ID=$(grep -Po "^$1:\s*\K[^:]+" /tmp/.niri_ndrop) && [ -n "$WINDOW_ID" ]; then
+					read -r workspace_id IS_FLOAT column_idx <<< "$(niri msg --json windows | jq -r --argjson appid $WINDOW_ID 'first(.[] | select(.id==$appid)) | "\(.workspace_id) \(.is_floating) \(.layout.pos_in_scrolling_layout[0])"')"
+				else
+					#echo $WINDOW_ID $workspace_id $IS_FLOAT $column_idx
+					read -r WINDOW_ID workspace_id IS_FLOAT column_idx app_id <<< "$(niri msg --json windows | jq -r 'first(.[] | select(.is_focused==true)) | "\(.id) \(.workspace_id) \(.is_floating) \(.layout.pos_in_scrolling_layout[0]) \(.app_id)"')"
+					if [[ -n "$WINDOW_ID" ]]; then
+						echo "$1: $WINDOW_ID: $app_id" >> /tmp/.niri_ndrop
+						# 如果你的系统支持 Pango 标记
+						notify-send -a "niri-scratchpad" "Niri Scratchpad" "Add to Scratchpad: $1\nScratchpad Info:\n<tt>$( (echo 'scratchpad window_id app_name'; tr -d ':' < /tmp/.niri_ndrop) | cut -d'.' -f1 | column -t -o '|' )</tt>"
+					else
+						notify-send -a "niri-scratchpad" "Niri Scratchpad" "No Window is Selected \nScratchpad Info:\n<tt>$( (echo 'scratchpad window_id app_id'; tr -d ':' < /tmp/.niri_ndrop)  | cut -d'.' -f1| column -t -o '|' )</tt>"
+					fi
+				fi
+				ACTION="number"
+				NUM_VAL="$1"
+				shift
+			else
+				echo "error: unknown argument -> '$1'" >&2
+				exit 1
+			fi
+			;;
+	esac
+done
+if [[ "$WINDOW_ID" != '' ]]; then
+	read -r output_id workspace_idx <<< "$(niri msg -j workspaces | jq -r --argjson workspace_id $workspace_id '.[] | select(.id == $workspace_id) | "\(.output) \(.idx)"')"
+fi
+
+read -r ACTIVE_WORKSPACE ACTIVE_WORKSPACE_IDX ACTIVE_OUTPUT <<< "$(niri msg --json workspaces | jq -r '.[] | select(.is_focused==true) | "\(.id) \(.idx) \(.output)"')"
+read -r output_width output_height <<< "$(niri msg --json outputs | jq -r ".[] | select(.name==\"$ACTIVE_OUTPUT\") | \"\(.logical.width) \(.logical.height)\"")"
+
+if [[ -n "$workspace_id" && "$ACTIVE_WORKSPACE" !=  $(niri msg -j workspaces | jq ".[] | select(.id == $workspace_id) | .id")  ]]; then
+	# REMOVE
+	if [[ "$IS_FLOAT" = "true" || $(niri msg -j windows | jq -r  "[.[] | select(.workspace_id == $workspace_id) | select(.layout.pos_in_scrolling_layout[0] == $column_idx)| .id] | length") = 1 ]]; then
+		niri msg action move-window-to-monitor --id "$WINDOW_ID" $ACTIVE_OUTPUT
+		niri msg action move-workspace-to-monitor  --reference "stash" $ACTIVE_OUTPUT
+		niri msg action focus-window --id "$WINDOW_ID" 
+	else
+		if [[ $ACTIVE_OUTPUT != $output_id ]]; then 
+			niri msg action focus-monitor $output_id
+		fi
+		niri msg action do-screen-transition
+		niri msg action focus-workspace $workspace_idx
+		niri msg action focus-column $(niri msg --json windows | jq -r ".[] | select(.id==$WINDOW_ID) | .layout.pos_in_scrolling_layout[0]")
+		niri msg action move-column-to-workspace  --focus false  "stash"
+		niri msg action move-workspace-to-monitor  --reference "stash" $ACTIVE_OUTPUT
+		niri msg action focus-workspace "stash"
+		niri msg action focus-column $(niri msg --json windows | jq -r ".[] | select(.id==$WINDOW_ID) | .layout.pos_in_scrolling_layout[0]")
+		niri msg action move-column-to-workspace $ACTIVE_WORKSPACE_IDX
+		
+	fi
+
+
+	if [ "$is_dropdown" = "true" ]; then
+		niri msg action set-window-width --id "$WINDOW_ID" 90%
+		niri msg action set-window-height --id "$WINDOW_ID" 49%
+		niri msg action move-floating-window --id "$WINDOW_ID" -y $((output_height/2))
+	fi
+elif [[ -n "$workspace_id" && "$ACTIVE_WORKSPACE" ==  $(niri msg -j workspaces | jq ".[] | select(.id == $workspace_id) | .id") ]]; then
+	# ADD
+	widx=$(niri msg --json windows | jq -r ".[] | select(.id==$WINDOW_ID) | .layout.pos_in_scrolling_layout[0]")
+	idx=$(niri msg --json windows | jq -r ".[] | select(.is_focused==true) | .layout.pos_in_scrolling_layout[0]")
+	if [[ "$IS_FLOAT" = "false" && $widx = $idx ||  "$IS_FLOAT" = "true" && $(niri msg --json windows | jq -r ".[] | select(.id==$WINDOW_ID)| .is_focused") == true ]]; then
+		if [[ "$IS_FLOAT" = "false" ]]; then
+			niri msg action move-column-to-workspace --focus false  "stash"
+			niri msg action focus-column $((column_idx > 1 ? column_idx-1 : 1))
+		else
+			niri msg action move-window-to-workspace --window-id "$WINDOW_ID" --focus false "stash"
+		fi
+	else
+		if [ "$IS_FLOAT" = "true" ]; then
+			niri msg action focus-window --id "$WINDOW_ID" 
+		else
+			if [[ "$idx" =  "null" ]]; then
+				niri msg action switch-focus-between-floating-and-tiling
+				idx=$(niri msg --json windows | jq -r ".[] | select(.is_focused==true) | .layout.pos_in_scrolling_layout[0]")
+			fi
+			niri msg action focus-column $widx
+			niri msg action move-column-to-index $(( widx > idx ? idx+1 : idx ))
+			niri msg action focus-column-left
+			niri msg action focus-column-right
+		fi
+	fi
+else
+	if [[ -n "$LAUNCH_CMD" ]]; then
+		niri msg action spawn -- sh -c "$LAUNCH_CMD"
+	elif [ "$is_dropdown" = "true" ]; then
+		foot -o csd.size=0 -o colors-dark.alpha=0.8 -a "dropdown" tmux attach
+	fi
+fi
+niri msg action move-workspace-to-index  --reference "stash" 255
+
