@@ -1,5 +1,6 @@
 {
-  "autoupdate": false,
+  "theme": "catppuccin",
+  "autoupdate": true,
   "$schema": "https://opencode.ai/config.json",
   "plugin": ["opencode-claude-auth@latest"]
 }
