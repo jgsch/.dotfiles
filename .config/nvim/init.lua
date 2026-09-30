@@ -378,6 +378,8 @@ require("lazy").setup({
 				lua = { "stylua" },
 				kotlin = { "ktfmt" },
 				nix = { "nixfmt" },
+				sh = { "shfmt" },
+				bash = { "shfmt" },
 			},
 		},
 	},

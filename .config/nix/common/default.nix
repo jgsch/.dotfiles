@@ -168,6 +168,7 @@ in
     pyright
     ruff
     rsync
+    shfmt
     starship
     stow
     stylua
