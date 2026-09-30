@@ -1,3 +1,8 @@
 .config/tmux/plugins
 *sync-conflict*
 .stfolder/
+
+.config/herdr/herdr-client.log
+.config/herdr/herdr-server.log
+.config/herdr/release-notes.json
+.config/herdr/session.json

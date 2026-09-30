@@ -10,10 +10,23 @@ name = "catppuccin"
 [keys]
 prefix = "alt+a"
 
+detach = "prefix+d"
+
 focus_pane_left = "alt+h"
 focus_pane_down = "alt+j"
 focus_pane_up = "alt+k"
 focus_pane_right = "alt+l"
+
+resize_pane_left = "alt+shift+h"
+resize_pane_down = "alt+shift+j"   # optional, e.g. "ctrl+shift+alt+down"
+resize_pane_up = "alt+shift+k"     # optional, e.g. "ctrl+shift+alt+up"
+resize_pane_right = "alt+shift+l"  # optional, e.g. "ctrl+shift+alt+right"
+
+previous_tab = "prefix+p"
+next_tab = "prefix+n"
+
+previous_workspace = "prefix+shift+p"
+next_workspace = "prefix+shift+n"
 
 split_vertical = "prefix+v"
 split_horizontal = "prefix+h"
@@ -21,7 +34,6 @@ split_horizontal = "prefix+h"
 # Prefix-mode actions
 # help = "prefix+?"
 # settings = "prefix+s"
-# detach = "prefix+q"
 # reload_config = "prefix+shift+r"
 # open_notification_target = "prefix+o"
 # workspace_picker = "prefix+w"
