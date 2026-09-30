@@ -12,7 +12,8 @@
             )),
         ),
         tiling_enabled: true,
-        id: None,
+        id: Some("1eb4c2a"),
+        name: None,
     ),
     (
         output: (
@@ -27,7 +28,8 @@
             )),
         ),
         tiling_enabled: true,
-        id: Some("da0f77"),
+        id: Some("4360d3"),
+        name: None,
     ),
     (
         output: (
@@ -42,7 +44,8 @@
             )),
         ),
         tiling_enabled: true,
-        id: None,
+        id: Some("a790c6"),
+        name: None,
     ),
     (
         output: (
@@ -57,7 +60,8 @@
             )),
         ),
         tiling_enabled: true,
-        id: None,
+        id: Some("3e3830"),
+        name: None,
     ),
     (
         output: (
@@ -72,7 +76,8 @@
             )),
         ),
         tiling_enabled: true,
-        id: None,
+        id: Some("13b13a9"),
+        name: None,
     ),
     (
         output: (
@@ -87,37 +92,8 @@
             )),
         ),
         tiling_enabled: true,
-        id: None,
-    ),
-    (
-        output: (
-            name: "eDP-1",
-            edid: Some((
-                manufacturer: ('B', 'O', 'E'),
-                product: 1759,
-                serial: None,
-                manufacture_week: 1,
-                manufacture_year: 2016,
-                model_year: None,
-            )),
-        ),
-        tiling_enabled: false,
-        id: Some("1b75c0d"),
-    ),
-    (
-        output: (
-            name: "eDP-1",
-            edid: Some((
-                manufacturer: ('B', 'O', 'E'),
-                product: 1759,
-                serial: None,
-                manufacture_week: 1,
-                manufacture_year: 2016,
-                model_year: None,
-            )),
-        ),
-        tiling_enabled: false,
-        id: Some("17489f9"),
+        id: Some("67bc2"),
+        name: None,
     ),
     (
         output: (
@@ -132,6 +108,23 @@
             )),
         ),
         tiling_enabled: true,
-        id: Some("1668d89"),
+        id: Some("cd7d1b"),
+        name: None,
+    ),
+    (
+        output: (
+            name: "eDP-1",
+            edid: Some((
+                manufacturer: ('B', 'O', 'E'),
+                product: 1759,
+                serial: None,
+                manufacture_week: 1,
+                manufacture_year: 2016,
+                model_year: None,
+            )),
+        ),
+        tiling_enabled: true,
+        id: Some("17c542d"),
+        name: None,
     ),
 ]

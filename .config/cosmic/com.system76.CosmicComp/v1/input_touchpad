@@ -4,11 +4,17 @@
         profile: None,
         speed: 0.5335157686324425,
     )),
-    click_method: Some(Clickfinger),
+    click_method: Some(ButtonAreas),
     scroll_config: Some((
         method: Some(TwoFinger),
         natural_scroll: Some(true),
         scroll_button: None,
         scroll_factor: None,
+    )),
+    tap_config: Some((
+        enabled: false,
+        button_map: Some(LeftRightMiddle),
+        drag: true,
+        drag_lock: false,
     )),
 )
