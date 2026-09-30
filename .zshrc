@@ -85,3 +85,9 @@ bindkey '^[[3;5~' kill-word
 bindkey -r '\ea'
 
 WORDCHARS=''
+
+_reset_keyboard_modes() {
+	printf '\e[<99u\e[>4;0m'
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _reset_keyboard_modes
