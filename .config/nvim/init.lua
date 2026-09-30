@@ -388,10 +388,11 @@ require("lazy").setup({
 		-- Highlight, edit, and navigate code
 
 		"nvim-treesitter/nvim-treesitter",
+		branch = "main",
+		lazy = false,
 		build = ":TSUpdate",
-		main = "nvim-treesitter.configs",
-		opts = {
-			ensure_installed = {
+		config = function()
+			require("nvim-treesitter").install({
 				"bash",
 				"c",
 				"diff",
@@ -404,13 +405,17 @@ require("lazy").setup({
 				"vim",
 				"vimdoc",
 				"nix",
-			},
-			auto_install = true,
-			highlight = {
-				enable = true,
-			},
-			indent = { enable = true, disable = { "ruby" } },
-		},
+			})
+
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function(args)
+					-- Start highlighting if a parser exists for this filetype
+					if pcall(vim.treesitter.start, args.buf) then
+						vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+					end
+				end,
+			})
+		end,
 	},
 
 	{
