@@ -23,3 +23,9 @@ sudo nixos-rebuild switch --flake /home/jg/.dotfiles/.config/nix#laptop
 cd ~/.dotfiles
 stow .
 ```
+
+## Herdr plugins
+
+```
+nix shell nixpkgs#cargo nixpkgs#rustc -c herdr plugin install willfish/herdr-navigator
+```

@@ -225,6 +225,21 @@ require("lazy").setup({
 	},
 
 	{
+		"willfish/herdr-navigator.nvim",
+		config = function()
+			require("herdr-navigator").setup({
+				mappings = {
+					left = "<M-h>",
+					down = "<A-j>",
+					up = "<A-k>",
+					right = "<A-l>",
+				},
+				herdr_executable = "herdr",
+			})
+		end,
+	},
+
+	{
 		"folke/sidekick.nvim",
 		lazy = false,
 		opts = {
